@@ -1,8 +1,8 @@
 const express = require('express')
 const app = express()
 const port = 8080
-const mongoose = require ('mongoose')
-const dbConfig = require ('./config/DbConfig')
+const mongoose = require('mongoose')
+const dbConfig = require('./config/DbConfig')
 const bCrypt = require('bcrypt')
 
 
@@ -19,7 +19,7 @@ mongoose.connect(dbConfig.mongoUrl, {
 })
 
 app.get("/", (req, res) => {
-    res.json ({
+    res.json({
         msg: "selamat Datang Di API"
     })
 })
@@ -27,6 +27,8 @@ app.get("/", (req, res) => {
 app.use('/users', require('./routes/userRoutes'))
 app.use('/kategori', require('./routes/kategoriRoutes'))
 app.use('/barang', require('./routes/barangRoutes'))
+app.use('/keranjang', require('./routes/KeranjangRoutes'))
+app.use("/transaksi", require("./routes/transaksiRoutes"));
 
 
 

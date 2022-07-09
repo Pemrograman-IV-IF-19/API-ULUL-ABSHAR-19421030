@@ -22,7 +22,20 @@ exports.InputBarang = (data) =>
 
 exports.getAllBarang = () =>
     new Promise(async (resolve, reject) => {
-        modelBarang.find({})
+        modelBarang.aggregate([
+            {
+                $lookup:
+                {
+                    from: "kategoris",
+                    localField: "idKategori",
+                    foreignField: "_id",
+                    as: "KategoriBarang"
+                }
+            },
+            {
+                $unwind: "$KategoriBarang"
+            }
+        ])
             .then(databarang => {
                 if (databarang.length > 0) {
                     resolve({
@@ -43,56 +56,86 @@ exports.getAllBarang = () =>
                 })
             })
     })
-    exports.getBarangById = (id) =>
+exports.getBarangById = (id) =>
     new Promise(async (resolve, reject) => {
-        modelBarang.findOne({ _id: ObjectId(id) })
-            .then(dataBarang => {
+        modelBarang.aggregate([
+            { $match: { _id: ObjectId(id) } },
+            {
+                $lookup:
+                {
+                    from: "kategoris",
+                    localField: "idKategori",
+                    foreignField: "_id",
+                    as: "KategoriBarang"
+                }
+            },
+            {
+                $unwind: "$KategoriBarang"
+            }
+        ]).then(dataBarang => {
                 if (dataBarang) {
                     resolve({
                         status: true,
                         msg: 'Berhasil memuat data',
                         data: dataBarang
                     })
-                }else {
+                } else {
                     reject({
                         status: false,
-                        msg: 'Tidak ada data kategori' + name
+                        msg: 'Tidak ada data barang'
                     })
                 }
-    }).catch(err => {
-        reject({
-            status: false,
-            msg: 'Terjadi kesalahan pada server'
-        })
+            }).catch(err => {
+                reject({
+                    status: false,
+                    msg: 'Terjadi kesalahan pada server'
+                })
+            })
     })
-})
 exports.updateDataBarang = (id, data) =>
-new Promise(async (resolve, reject) => {
-    modelBarang.updateOne({_id: ObjectId(id) }, data)
-    .then(() => {
-        resolve({
-            status: true,
-            msg: 'Berhasil merubah data'
-        })
-    }).catch(err => {
-        reject({
-            status: false,
-            msg: 'Terjadi kesalahan pada server'
-        })
+    new Promise(async (resolve, reject) => {
+        modelBarang.updateOne({ _id: ObjectId(id) }, data)
+            .then(() => {
+                resolve({
+                    status: true,
+                    msg: 'Berhasil merubah data'
+                })
+            }).catch(err => {
+                reject({
+                    status: false,
+                    msg: 'Terjadi kesalahan pada server'
+                })
+            })
     })
-})
+
+    exports.updateGambar = (id, gambar) =>
+    new Promise(async (resolve, reject) => {
+        modelBarang.updateOne({ _id: ObjectId(id) }, {$set: {gambar: gambar}})
+            .then(() => {
+                resolve({
+                    status: true,
+                    msg: 'Berhasil merubah data'
+                })
+            }).catch(err => {
+                reject({
+                    status: false,
+                    msg: 'Terjadi kesalahan pada server'
+                })
+            })
+    })
+
 exports.deleteData = (id) =>
-new Promise(async (resolve, reject) => {
-    modelBarang.deleteOne({_id: ObjectId(id) })
-    .then(() => {
-        resolve({
-            status: true,
-            msg: 'Berhasil Mengpusdata data'
-        })
-    }).catch(err => {
-        reject({
-            status: false,
-            msg: 'Terjadi kesalahan pada server'
-        })
+    new Promise(async (resolve, reject) => {
+        modelBarang.deleteOne({ _id: ObjectId(id) })
+            .then(() => {
+                resolve({
+                    status: true,
+                    msg: 'Berhasil Mengpusdata data'
+                })
+            }).catch(err => {
+                reject({
+                    status: false,
+                    msg: 'Terjadi kesalahan pada server'
+                })
+            })
     })
-})

@@ -14,6 +14,9 @@ const barangSchema = new Schema({
     },
     idKategori: {
         type: ObjectId
+    },
+    gambar:{
+        type: String
     }
 })
 module.exports = mongoose.model('barang', barangSchema)
